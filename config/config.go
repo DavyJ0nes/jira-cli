@@ -12,7 +12,7 @@ func LoadConfigFile() {
 	viper.AddConfigPath("$HOME/.jli")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig() // Find and read the config file
-	if err != nil { // Handle errors reading the config file
+	if err != nil {             // Handle errors reading the config file
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
 
@@ -24,17 +24,20 @@ func LoadConfigFile() {
 }
 
 type Jira struct {
-	url string
+	url      string
 	username string
-	token string
-	Client *jira.Client
+	token    string
+	boardID  string
+	Client   *jira.Client
 }
-func NewJIRAClient() *Jira{
+
+func NewJIRAClient() *Jira {
 	j := &Jira{}
 
 	j.url = viper.GetString("endpoint")
 	j.username = viper.GetString("username")
 	j.token = viper.GetString("token")
+	j.boardID = viper.GetString("boardid")
 
 	return j
 }
@@ -53,4 +56,13 @@ func (j *Jira) Connect() *Jira {
 	j.Client = jiraClient
 
 	return j
+}
+
+func (j *Jira) GetSprints() []jira.Sprint {
+	sprints, _, err := j.Client.Board.GetAllSprints(j.boardID)
+	if err != nil {
+		panic(err)
+	}
+
+	return sprints
 }

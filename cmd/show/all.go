@@ -19,13 +19,9 @@ var allCmd = &cobra.Command{
 
 func showAll() {
 	j := config.NewJIRAClient().Connect()
-	sprints, _, err := j.Client.Board.GetAllSprints("326")
-	if err != nil {
-		panic(err)
-	}
 
 	var activeSprint int
-	for _, s := range sprints {
+	for _, s := range j.GetSprints() {
 		if s.State == "active" {
 			activeSprint = s.ID
 		}
